@@ -18,13 +18,13 @@
 ## SYNOPSIS
 
 ```bash
-rm -rf dist/ dump.sql && ./run_pg_dump.sh -i init.sql && ./run_liam_erd.sh
+rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && ./run_liam_erd.sh
 ```
 
 ## スクリプト
 
-### run_pg_dump.sh
-PostgreSQL のスキーマをダンプするための自動化スクリプト。
+### schema2dump.sh
+スキーマSQLファイルをPostgreSQLのダンプ形式に変換するスクリプト。
 
 **機能:**
 - PostgreSQL コンテナの自動起動
@@ -35,16 +35,16 @@ PostgreSQL のスキーマをダンプするための自動化スクリプト。
 **使用方法:**
 ```bash
 # ヘルプを表示
-./run_pg_dump.sh -h
+./schema2dump.sh -h
 
 # 単一ファイルを指定
-./run_pg_dump.sh -i init.sql
+./schema2dump.sh -i init.sql
 
 # 複数ファイルを指定
-./run_pg_dump.sh -i schema1.sql -i schema2.sql -i data.sql
+./schema2dump.sh -i schema1.sql -i schema2.sql -i data.sql
 
 # ポートと出力ファイルも指定
-./run_pg_dump.sh -p 25432 -i init.sql -o my_dump.sql
+./schema2dump.sh -p 25432 -i init.sql -o my_dump.sql
 ```
 
 **オプション:**
@@ -67,8 +67,8 @@ liam-erd を使用してER図を生成し、ローカルサーバーで表示す
 ## 完全なワークフロー例
 
 ```bash
-# 1. スキーマをダンプ
-./run_pg_dump.sh -i init.sql
+# 1. スキーマをダンプ形式に変換
+./schema2dump.sh -i init.sql
 
 # 2. ER図を生成して表示
 ./run_liam_erd.sh
@@ -97,7 +97,7 @@ Actions タブから "Deploy ERD to GitHub Pages" ワークフローを手動で
 ## ファイル構成
 
 - `init.sql`: サンプルのデータベーススキーマ（外部キー制約付き）
-- `run_pg_dump.sh`: スキーマダンプ自動化スクリプト
+- `schema2dump.sh`: スキーマSQLをダンプ形式に変換するスクリプト
 - `run_liam_erd.sh`: ER図生成・表示スクリプト
 - `CLAUDE.md`: Claude Code 用の開発ガイドライン
 

@@ -10,25 +10,25 @@ This is a test repository for experimenting with `liam-erd`, a tool for generati
 
 ### Quick Start
 ```bash
-# Generate ERD locally (removes old files, dumps schema, builds ERD, serves locally)
-rm -rf dist/ dump.sql && ./run_pg_dump.sh -i init.sql && ./run_liam_erd.sh
+# Generate ERD locally (removes old files, converts schema to dump, builds ERD, serves locally)
+rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && ./run_liam_erd.sh
 ```
 
 ### Individual Commands
 
-#### Database Schema Dump
+#### Schema to Dump Conversion
 ```bash
-# Basic usage (uses init.sql by default - will show help if no files specified)
-./run_pg_dump.sh -i init.sql
+# Basic usage (will show help if no files specified)
+./schema2dump.sh -i init.sql
 
 # Multiple schema files
-./run_pg_dump.sh -i schema1.sql -i schema2.sql -i data.sql
+./schema2dump.sh -i schema1.sql -i schema2.sql -i data.sql
 
 # Custom port and output
-./run_pg_dump.sh -p 25432 -i init.sql -o my_dump.sql
+./schema2dump.sh -p 25432 -i init.sql -o my_dump.sql
 
 # Show help
-./run_pg_dump.sh -h
+./schema2dump.sh -h
 ```
 
 #### ERD Generation
@@ -49,7 +49,7 @@ This will:
 
 ### Files
 - `init.sql`: Comprehensive PostgreSQL schema with multiple schemas (auth, ecommerce, analytics), various relationship types, and PostgreSQL features
-- `run_pg_dump.sh`: Automated script for PostgreSQL container management and schema dumping
+- `schema2dump.sh`: Script to convert schema SQL files to PostgreSQL dump format
   - Default port: 15432 (to avoid conflicts with common PostgreSQL installations)
   - Default output: dump.sql
   - Supports multiple input files
