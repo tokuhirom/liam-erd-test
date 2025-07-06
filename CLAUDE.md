@@ -11,7 +11,7 @@ This is a test repository for experimenting with `liam-erd`, a tool for generati
 ### Quick Start
 ```bash
 # Generate ERD locally (removes old files, converts schema to dump, builds ERD, serves locally)
-rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && ./run_liam_erd.sh
+rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && npx @liam-hq/cli erd build --input dump.sql --format postgres && npx http-server -c-1 dist/
 ```
 
 ### Individual Commands
@@ -31,15 +31,16 @@ rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && ./run_liam_erd.sh
 ./schema2dump.sh -h
 ```
 
-#### ERD Generation
+#### ERD Generation and Viewing
 ```bash
-# Generate ERD and serve locally
-./run_liam_erd.sh
+# Generate ERD from dump file
+npx @liam-hq/cli erd build --input dump.sql --format postgres
+
+# Serve the generated ERD locally (with cache disabled)
+npx http-server -c-1 dist/
 ```
 
-This will:
-1. Use `@liam-hq/cli` to build ERD from dump.sql
-2. Serve the generated files at http://localhost:8080
+The ERD will be accessible at http://localhost:8080
 
 ### Testing and Linting
 - Run `npm run lint` or appropriate linting commands if available
@@ -53,7 +54,6 @@ This will:
   - Default port: 15432 (to avoid conflicts with common PostgreSQL installations)
   - Default output: dump.sql
   - Supports multiple input files
-- `run_liam_erd.sh`: ERD generation and local serving script
 - `.github/workflows/deploy-erd.yml`: GitHub Actions workflow for automatic ERD deployment to GitHub Pages
 
 ### Database Schema Structure

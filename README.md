@@ -18,7 +18,7 @@
 ## SYNOPSIS
 
 ```bash
-rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && ./run_liam_erd.sh
+rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && npx @liam-hq/cli erd build --input dump.sql --format postgres && npx http-server -c-1 dist/
 ```
 
 ## スクリプト
@@ -53,16 +53,16 @@ rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && ./run_liam_erd.sh
 - `-o, --output FILE`: 出力ダンプファイル (デフォルト: dump.sql)
 - `-h, --help`: ヘルプ表示
 
-### run_liam_erd.sh
-liam-erd を使用してER図を生成し、ローカルサーバーで表示するスクリプト。
+### liam-erd によるER図生成
+liam-erd を使用してER図を生成し、ローカルサーバーで表示します。
 
 ```bash
-./run_liam_erd.sh
-```
+# ER図を生成
+npx @liam-hq/cli erd build --input dump.sql --format postgres
 
-このスクリプトは以下を実行します：
-1. `dump.sql` から liam-erd を使用してER図を生成
-2. `http-server` で生成されたER図を表示
+# ローカルサーバーで表示（キャッシュ無効）
+npx http-server -c-1 dist/
+```
 
 ## 完全なワークフロー例
 
@@ -70,8 +70,11 @@ liam-erd を使用してER図を生成し、ローカルサーバーで表示す
 # 1. スキーマをダンプ形式に変換
 ./schema2dump.sh -i init.sql
 
-# 2. ER図を生成して表示
-./run_liam_erd.sh
+# 2. ER図を生成
+npx @liam-hq/cli erd build --input dump.sql --format postgres
+
+# 3. ローカルサーバーで表示
+npx http-server -c-1 dist/
 ```
 
 ブラウザで `http://localhost:8080` にアクセスしてER図を確認できます。
@@ -98,6 +101,6 @@ Actions タブから "Deploy ERD to GitHub Pages" ワークフローを手動で
 
 - `init.sql`: サンプルのデータベーススキーマ（外部キー制約付き）
 - `schema2dump.sh`: スキーマSQLをダンプ形式に変換するスクリプト
-- `run_liam_erd.sh`: ER図生成・表示スクリプト
 - `CLAUDE.md`: Claude Code 用の開発ガイドライン
+- `.github/workflows/deploy-erd.yml`: GitHub Actions ワークフロー
 
