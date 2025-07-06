@@ -6,6 +6,7 @@ POSTGRES_PASSWORD="pass"
 POSTGRES_USER="postgres"
 POSTGRES_DB="postgres"
 POSTGRES_PORT="15432"  # Default to 15432 to avoid conflicts
+POSTGRES_VERSION="15-alpine"  # Default PostgreSQL version
 INPUT_FILES=()
 OUTPUT_FILE="dump.sql"
 
@@ -20,6 +21,7 @@ usage() {
     echo ""
     echo "Options:"
     echo "  -p, --port PORT         PostgreSQL port (default: 15432)"
+    echo "  -v, --version VERSION   PostgreSQL version (default: 15-alpine)"
     echo "  -i, --input FILE        Input SQL file (can be specified multiple times)"
     echo "  -o, --output FILE       Output dump file (default: dump.sql)"
     echo "  -h, --help             Display this help message"
@@ -27,6 +29,13 @@ usage() {
     echo "Examples:"
     echo "  $0 -i init.sql"
     echo "  $0 -p 25432 -i schema1.sql -i schema2.sql -o dumped_schema.sql"
+    echo "  $0 -v 17-alpine -i init.sql"
+    echo "  $0 -v 16.4 -i init.sql -o dump.sql"
+    echo ""
+    echo "Available PostgreSQL versions:"
+    echo "  - 17-alpine, 16-alpine, 15-alpine, 14-alpine (lightweight)"
+    echo "  - 17, 16, 15, 14 (full versions)"
+    echo "  - Or any specific version tag from Docker Hub"
     echo ""
     exit 1
 }
@@ -36,6 +45,10 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         -p|--port)
             POSTGRES_PORT="$2"
+            shift 2
+            ;;
+        -v|--version)
+            POSTGRES_VERSION="$2"
             shift 2
             ;;
         -i|--input)
@@ -71,7 +84,7 @@ for input_file in "${INPUT_FILES[@]}"; do
     fi
 done
 
-echo "Starting PostgreSQL container..."
+echo "Starting PostgreSQL container (version: $POSTGRES_VERSION)..."
 
 # Stop and remove existing container if it exists
 docker stop $CONTAINER_NAME 2>/dev/null
@@ -82,7 +95,7 @@ docker run -d \
   --name $CONTAINER_NAME \
   -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
   -p $POSTGRES_PORT:5432 \
-  postgres:15-alpine
+  postgres:$POSTGRES_VERSION
 
 # Wait for PostgreSQL to be ready
 echo "Waiting for PostgreSQL to be ready..."

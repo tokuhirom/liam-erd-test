@@ -77,10 +77,17 @@ npx http-server -c-1 dist/
 
 # ポートと出力ファイルも指定
 ./schema2dump.sh -p 25432 -i init.sql -o my_dump.sql
+
+# PostgreSQL 17を使用
+./schema2dump.sh -v 17-alpine -i init.sql
+
+# 特定のバージョンを使用
+./schema2dump.sh -v 16.4 -i schema1.sql -o dump.sql
 ```
 
 **オプション:**
 - `-p, --port PORT`: PostgreSQL ポート (デフォルト: 15432)
+- `-v, --version VERSION`: PostgreSQL バージョン (デフォルト: 15-alpine)
 - `-i, --input FILE`: 入力SQLファイル（複数指定可能、必須）
 - `-o, --output FILE`: 出力ダンプファイル (デフォルト: dump.sql)
 - `-h, --help`: ヘルプ表示
@@ -89,7 +96,14 @@ npx http-server -c-1 dist/
 すべての `src/input-*.sql` ファイルから ERD を一括生成するスクリプト。
 
 ```bash
+# デフォルトのPostgreSQLバージョンで実行
 ./build.sh
+
+# PostgreSQL 17を使用
+./build.sh -v 17-alpine
+
+# ヘルプを表示
+./build.sh -h
 ```
 
 **機能:**
@@ -98,6 +112,10 @@ npx http-server -c-1 dist/
 - liam-erd で ERD を生成
 - `out/` ディレクトリに整理して配置
 - インデックスページ (`out/index.html`) を自動生成
+
+**オプション:**
+- `-v, --version VERSION`: PostgreSQL バージョン (デフォルト: schema2dump.sh の設定を使用)
+- `-h, --help`: ヘルプ表示
 
 ## 新しいスキーマの追加
 

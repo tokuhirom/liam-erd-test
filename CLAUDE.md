@@ -20,13 +20,19 @@ The project now supports multiple schema files and generates a comprehensive ERD
 
 #### Build All ERDs
 ```bash
-# Generate all ERDs from src/input-*.sql files
+# Generate all ERDs with default PostgreSQL version
 ./build.sh
+
+# Use PostgreSQL 17 for all ERDs
+./build.sh -v 17-alpine
+
+# Show help
+./build.sh -h
 ```
 
 This will:
 1. Process all `src/input-*.sql` files
-2. Convert each to PostgreSQL dump format
+2. Convert each to PostgreSQL dump format (using specified version)
 3. Generate ERDs using liam-erd
 4. Create an index page at `out/index.html`
 
@@ -40,6 +46,12 @@ This will:
 
 # Custom port and output
 ./schema2dump.sh -p 25432 -i src/input-ec.sql -o my_dump.sql
+
+# Use PostgreSQL 17
+./schema2dump.sh -v 17-alpine -i src/input-ec.sql
+
+# Use specific PostgreSQL version
+./schema2dump.sh -v 16.4 -i init.sql -o dump.sql
 
 # Show help
 ./schema2dump.sh -h
@@ -68,12 +80,15 @@ The ERD will be accessible at http://localhost:8080
   - `input-simple.sql`: Simple two-table schema demonstrating basic foreign key relationships
 - `schema2dump.sh`: Script to convert schema SQL files to PostgreSQL dump format
   - Default port: 15432 (to avoid conflicts with common PostgreSQL installations)
+  - Default PostgreSQL version: 15-alpine
   - Default output: dump.sql
   - Supports multiple input files
+  - Supports different PostgreSQL versions via `-v` option
 - `build.sh`: Batch processing script that generates ERDs for all schema files
   - Automatically detects `src/input-*.sql` files
   - Generates organized output in `out/` directory
   - Creates an index page for easy navigation
+  - Supports PostgreSQL version selection via `-v` option
 - `.github/workflows/deploy-erd.yml`: GitHub Actions workflow for automatic ERD deployment to GitHub Pages
   - Runs `build.sh` to generate all ERDs
   - Deploys `out/` directory to GitHub Pages

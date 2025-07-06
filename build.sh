@@ -8,11 +8,53 @@
 
 set -e
 
+# Default values
+POSTGRES_VERSION=""
+
 # Colors for output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# Function to display usage
+usage() {
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  -v, --version VERSION   PostgreSQL version to use (default: 15-alpine)"
+    echo "  -h, --help             Display this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0                     # Use default PostgreSQL version"
+    echo "  $0 -v 17-alpine        # Use PostgreSQL 17"
+    echo "  $0 --version 16.4      # Use specific PostgreSQL version"
+    exit 1
+}
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -v|--version)
+            POSTGRES_VERSION="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            ;;
+        *)
+            echo "Unknown option: $1"
+            usage
+            ;;
+    esac
+done
+
+# Prepare schema2dump.sh arguments
+SCHEMA_ARGS=""
+if [ -n "$POSTGRES_VERSION" ]; then
+    SCHEMA_ARGS="-v $POSTGRES_VERSION"
+    echo -e "${BLUE}Using PostgreSQL version: $POSTGRES_VERSION${NC}"
+fi
 
 echo -e "${BLUE}Starting build process...${NC}"
 
@@ -37,7 +79,7 @@ for input_file in src/input-*.sql; do
     # Convert schema to dump
     dump_file="src/dump-${name}.sql"
     echo "  Converting schema to dump..."
-    ./schema2dump.sh -i "$input_file" -o "$dump_file"
+    ./schema2dump.sh $SCHEMA_ARGS -i "$input_file" -o "$dump_file"
     
     # Generate ERD
     output_dir="out/${name}"
