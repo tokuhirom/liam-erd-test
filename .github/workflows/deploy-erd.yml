@@ -27,37 +27,13 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Start PostgreSQL container
+      - name: Make scripts executable
         run: |
-          docker run -d \
-            --name postgres-erd \
-            -e POSTGRES_PASSWORD=pass \
-            -p 15432:5432 \
-            postgres:15-alpine
-          
-          # Wait for PostgreSQL to be ready
-          echo "Waiting for PostgreSQL to be ready..."
-          for i in {1..30}; do
-            if docker exec postgres-erd pg_isready -U postgres >/dev/null 2>&1; then
-              echo "PostgreSQL is ready!"
-              break
-            fi
-            echo -n "."
-            sleep 1
-          done
+          chmod +x schema2dump.sh
+          chmod +x build.sh
 
-      - name: Load schema and dump
-        run: |
-          # Load schema
-          docker exec -i postgres-erd psql -U postgres -d postgres < init.sql
-          
-          # Dump schema
-          docker exec postgres-erd pg_dump --schema-only --file=/tmp/dump.sql postgresql://postgres:pass@localhost:5432/postgres
-          docker cp postgres-erd:/tmp/dump.sql ./dump.sql
-
-      - name: Generate ERD with liam-erd
-        run: |
-          npx @liam-hq/cli erd build --input dump.sql --format postgres
+      - name: Build ERDs
+        run: ./build.sh
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -65,13 +41,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './dist'
-
-      - name: Cleanup
-        if: always()
-        run: |
-          docker stop postgres-erd || true
-          docker rm postgres-erd || true
+          path: './out'
 
   deploy:
     environment:

@@ -8,17 +8,49 @@
 2. SQLファイルからスキーマを読み込み
 3. `pg_dump` でスキーマをダンプ
 4. liam-erd でER図をHTML形式で生成
-5. ローカルサーバーで表示
+5. GitHub Pages で自動公開
 
 ## 必要な環境
 
 - Docker
 - Node.js / npm
 
-## SYNOPSIS
+## プロジェクト構成
+
+```
+.
+├── src/
+│   ├── input-ec.sql      # Eコマーススキーマ（複雑な例）
+│   └── input-simple.sql  # シンプルなスキーマ（基本例）
+├── schema2dump.sh         # スキーマをダンプ形式に変換
+├── build.sh              # 全ERDを一括生成
+└── out/                  # 生成されたERD（GitHub Pages用）
+    ├── index.html        # ERD一覧
+    ├── ec/               # Eコマース ERD
+    └── simple/           # シンプル ERD
+```
+
+## クイックスタート
+
+### 全ERDを一括生成
 
 ```bash
-rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && npx @liam-hq/cli erd build --input dump.sql --format postgres && npx http-server -c-1 dist/
+./build.sh
+```
+
+これにより、`src/input-*.sql` のすべてのスキーマから ERD が生成され、`out/` ディレクトリに配置されます。
+
+### 個別のERD生成
+
+```bash
+# スキーマをダンプ形式に変換
+./schema2dump.sh -i src/input-simple.sql -o dump.sql
+
+# ERDを生成
+npx @liam-hq/cli erd build --input dump.sql --format postgres
+
+# ローカルで確認
+npx http-server -c-1 dist/
 ```
 
 ## スクリプト
@@ -53,31 +85,37 @@ rm -rf dist/ dump.sql && ./schema2dump.sh -i init.sql && npx @liam-hq/cli erd bu
 - `-o, --output FILE`: 出力ダンプファイル (デフォルト: dump.sql)
 - `-h, --help`: ヘルプ表示
 
-### liam-erd によるER図生成
-liam-erd を使用してER図を生成し、ローカルサーバーで表示します。
+### build.sh
+すべての `src/input-*.sql` ファイルから ERD を一括生成するスクリプト。
 
 ```bash
-# ER図を生成
-npx @liam-hq/cli erd build --input dump.sql --format postgres
-
-# ローカルサーバーで表示（キャッシュ無効）
-npx http-server -c-1 dist/
+./build.sh
 ```
 
-## 完全なワークフロー例
+**機能:**
+- `src/input-*.sql` ファイルを自動検出
+- 各スキーマを PostgreSQL ダンプ形式に変換
+- liam-erd で ERD を生成
+- `out/` ディレクトリに整理して配置
+- インデックスページ (`out/index.html`) を自動生成
+
+## 新しいスキーマの追加
+
+1. `src/input-{name}.sql` という名前でスキーマファイルを作成
+2. `./build.sh` を実行
+3. `out/{name}/` に ERD が生成される
+
+## ローカルでの確認
 
 ```bash
-# 1. スキーマをダンプ形式に変換
-./schema2dump.sh -i init.sql
+# ERDを生成
+./build.sh
 
-# 2. ER図を生成
-npx @liam-hq/cli erd build --input dump.sql --format postgres
-
-# 3. ローカルサーバーで表示
-npx http-server -c-1 dist/
+# ローカルサーバーで確認
+npx http-server -c-1 out/
 ```
 
-ブラウザで `http://localhost:8080` にアクセスしてER図を確認できます。
+ブラウザで `http://localhost:8080` にアクセスして ERD 一覧を確認できます。
 
 ## GitHub Pages での自動デプロイ
 
@@ -99,8 +137,12 @@ Actions タブから "Deploy ERD to GitHub Pages" ワークフローを手動で
 
 ## ファイル構成
 
-- `init.sql`: サンプルのデータベーススキーマ（外部キー制約付き）
+- `src/input-*.sql`: 入力スキーマファイル
+  - `input-ec.sql`: Eコマーススキーマ（複雑な例）
+  - `input-simple.sql`: シンプルなスキーマ（基本例）
 - `schema2dump.sh`: スキーマSQLをダンプ形式に変換するスクリプト
+- `build.sh`: 全ERDを一括生成するスクリプト
 - `CLAUDE.md`: Claude Code 用の開発ガイドライン
 - `.github/workflows/deploy-erd.yml`: GitHub Actions ワークフロー
+- `out/`: 生成されたERD（GitHub Pagesで公開）
 
