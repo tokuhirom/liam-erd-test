@@ -186,6 +186,8 @@ for input_file in src/input-*.sql; do
                 ;;
             "simple")
                 description="シンプルな2テーブル構成（外部キー制約の基本例）"
+            "issue2345")
+                description="reproducing code for https://github.com/liam-hq/liam/issues/2345"
                 ;;
             *)
                 description="データベーススキーマ"
